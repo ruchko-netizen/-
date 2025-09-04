@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Навчальна гра: Теорії соціальної роботи</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .draggable {
+            cursor: grab;
+            transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+        }
+        .draggable:active {
+            cursor: grabbing;
+        }
+        .dropzone {
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .drag-over {
+            border-color: #3b82f6;
+            background-color: #dbeafe;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-10 flex flex-col items-center">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-7xl bg-white rounded-xl shadow-2xl p-6 md:p-12">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-gray-900 mb-2">Навчальна гра</h1>
+        <h2 class="text-xl md:text-2xl font-semibold text-center text-gray-700 mb-8">Складання структурно-логічної схеми</h2>
+
+        <!-- Instructions and Game Area -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Instructions Panel -->
+            <div class="w-full lg:w-1/3 bg-gray-50 p-6 rounded-xl shadow-inner text-gray-700">
+                <h3 class="text-2xl font-bold mb-4">Інструкція</h3>
+                <p class="mb-4">Перетягніть та опустіть кожну картку з теорією у відповідну категорію. Складіть правильну схему, щоб перевірити свої знання.</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Використовуйте мишу, щоб перетягнути картки з нижнього блоку.</li>
+                    <li>Опускайте картки в одну з п'яти категорій.</li>
+                    <li>Натисніть кнопку **"Перевірити"**, щоб отримати результат.</li>
+                    <li>Зелений колір картки означає правильний вибір, червоний — неправильний.</li>
+                </ul>
+            </div>
+
+            <!-- Game Board -->
+            <div class="w-full lg:w-2/3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Drop Zones -->
+                    <div id="developers" class="dropzone p-6 bg-blue-100 rounded-xl border-2 border-dashed border-blue-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-blue-800 mb-2">За розробником/використовувачем</h4>
+                    </div>
+                    <div id="aspects" class="dropzone p-6 bg-green-100 rounded-xl border-2 border-dashed border-green-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-green-800 mb-2">За аспектом (зовнішній/внутрішній)</h4>
+                    </div>
+                    <div id="purpose" class="dropzone p-6 bg-purple-100 rounded-xl border-2 border-dashed border-purple-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-purple-800 mb-2">За призначенням (формальні/неформальні)</h4>
+                    </div>
+                    <div id="sibeon" class="dropzone p-6 bg-yellow-100 rounded-xl border-2 border-dashed border-yellow-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-yellow-800 mb-2">За Р. Сібеоном</h4>
+                    </div>
+                    <div id="psychological" class="dropzone p-6 bg-red-100 rounded-xl border-2 border-dashed border-red-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-red-800 mb-2">Психологічно орієнтовані</h4>
+                    </div>
+                    <div id="sociological" class="dropzone p-6 bg-indigo-100 rounded-xl border-2 border-dashed border-indigo-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-indigo-800 mb-2">Соціологічно орієнтовані</h4>
+                    </div>
+                    <div id="complex" class="dropzone p-6 bg-pink-100 rounded-xl border-2 border-dashed border-pink-300 flex flex-col items-center justify-center min-h-[150px]">
+                        <h4 class="text-lg font-bold text-center text-pink-800 mb-2">Комплексні (біопсихосоціальні)</h4>
+                    </div>
+                </div>
+
+                <!-- Draggable Cards Container -->
+                <div class="p-6 bg-gray-100 rounded-xl shadow-inner mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Картки з теоріями</h3>
+                    <div id="cards-container" class="flex flex-wrap justify-center gap-4">
+                        <!-- Draggable cards will be generated here by JS -->
+                    </div>
+                </div>
+
+                <!-- Buttons and Feedback -->
+                <div class="flex justify-center items-center gap-4">
+                    <button id="check-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition duration-300">Перевірити</button>
+                    <button id="reset-btn" class="bg-gray-400 text-gray-800 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-500 transition duration-300">Скинути</button>
+                </div>
+                <div id="feedback-message" class="mt-6 text-center text-lg font-semibold min-h-[40px]"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for the game
+        const theoriesData = {
+            'Великі теорії': 'developers',
+            'Теорії середнього рівня': 'developers',
+            'Ситуаційні теорії': 'developers',
+            'Зовнішні теорії': 'aspects',
+            'Внутрішні теорії': 'aspects',
+            'Неформальні теорії': 'purpose',
+            'Формальні теорії': 'purpose',
+            'Теорії, що пояснюють засоби практики': 'sibeon',
+            'Теорії, що пояснюють світ клієнта': 'sibeon',
+            'Теорії, що пояснюють цілі соціальної роботи': 'sibeon',
+            'Психодинамічна теорія': 'psychological',
+            'Когнітивно-біхевіористська теорія': 'psychological',
+            'Гуманістично-екзистенційна модель': 'psychological',
+            'Системна модель': 'sociological',
+            'Екологічна модель': 'sociological',
+            'Соціально-радикальні моделі': 'sociological',
+            'Теорія ролей': 'sociological',
+            'Теорія стигматизації': 'sociological',
+            'Теорії конфлікту': 'sociological',
+            'Теорії девіантної поведінки': 'sociological',
+            'Теорія кризового втручання': 'complex',
+            'Зосереджена на завданні модель': 'complex',
+            'Підхід, орієнтований на сильні сторони клієнта': 'complex',
+            'Сімейна терапія': 'complex',
+            'Психосоціальна терапія': 'complex',
+            'Соціально-педагогічна модель': 'complex',
+        };
+
+        const cardsContainer = document.getElementById('cards-container');
+        const dropzones = document.querySelectorAll('.dropzone');
+        const checkButton = document.getElementById('check-btn');
+        const resetButton = document.getElementById('reset-btn');
+        const feedbackMessage = document.getElementById('feedback-message');
+
+        // Function to shuffle an array
+        const shuffleArray = (array) => {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        };
+
+        // Function to create and render cards
+        const createCards = () => {
+            cardsContainer.innerHTML = '';
+            const theoryNames = shuffleArray(Object.keys(theoriesData));
+            theoryNames.forEach(name => {
+                const card = document.createElement('div');
+                card.id = `card-${name.replace(/\s/g, '-')}`;
+                card.textContent = name;
+                card.classList.add('draggable', 'p-4', 'bg-white', 'rounded-lg', 'shadow-sm', 'cursor-grab', 'text-sm', 'text-center', 'font-medium', 'border-2', 'border-gray-200');
+                card.setAttribute('draggable', 'true');
+                cardsContainer.appendChild(card);
+            });
+        };
+
+        // Event Listeners for Drag and Drop
+        let draggedItem = null;
+
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('draggable')) {
+                draggedItem = e.target;
+                e.dataTransfer.setData('text/plain', e.target.id);
+                setTimeout(() => {
+                    e.target.style.opacity = '0.5';
+                }, 0);
+            }
+        });
+
+        document.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('draggable')) {
+                e.target.style.opacity = '1';
+                draggedItem = null;
+            }
+        });
+
+        dropzones.forEach(dropzone => {
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (draggedItem) {
+                    dropzone.classList.add('drag-over');
+                }
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('drag-over');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+                const cardId = e.dataTransfer.getData('text/plain');
+                const card = document.getElementById(cardId);
+                if (card) {
+                    dropzone.appendChild(card);
+                }
+            });
+        });
+
+        // Check and Reset functions
+        checkButton.addEventListener('click', () => {
+            let correctCount = 0;
+            let totalCount = 0;
+            const cards = document.querySelectorAll('.draggable');
+            cards.forEach(card => {
+                const theoryName = card.textContent;
+                const parentId = card.parentElement.id;
+                const correctCategory = theoriesData[theoryName];
+
+                card.classList.remove('border-red-500', 'border-green-500');
+                card.classList.add('transition-colors', 'duration-500');
+                
+                if (parentId === correctCategory) {
+                    card.classList.add('border-green-500');
+                    correctCount++;
+                } else {
+                    card.classList.add('border-red-500');
+                }
+                totalCount++;
+            });
+
+            if (correctCount === totalCount) {
+                feedbackMessage.textContent = `Вітаємо! Ви правильно розклали всі ${totalCount} картки!`;
+                feedbackMessage.classList.remove('text-red-500', 'text-gray-700');
+                feedbackMessage.classList.add('text-green-600');
+            } else {
+                feedbackMessage.textContent = `Ви правильно розклали ${correctCount} з ${totalCount} карток. Спробуйте ще раз!`;
+                feedbackMessage.classList.remove('text-green-600', 'text-gray-700');
+                feedbackMessage.classList.add('text-red-500');
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            createCards();
+            dropzones.forEach(zone => {
+                const cardsInZone = zone.querySelectorAll('.draggable');
+                cardsInZone.forEach(card => {
+                    card.classList.remove('border-red-500', 'border-green-500');
+                    cardsContainer.appendChild(card);
+                });
+            });
+            feedbackMessage.textContent = '';
+        });
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            createCards();
+        });
+    </script>
+</body>
+</html>
